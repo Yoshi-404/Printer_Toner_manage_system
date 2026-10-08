@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Toner{% endblock %} · Gestão de toner</title>
+<style>
+:root{--bg:#f3f5f4;--ink:#18211d;--mut:#617068;--card:#fff;--line:#dbe1de;--brand:#1f4d3f;
+--ok:#2e8b57;--warn:#d9942b;--crit:#c2392f;--nd:#9aa5a0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+a{color:var(--brand)}
+header{background:var(--brand);color:#fff;display:flex;gap:20px;align-items:center;padding:10px 24px;flex-wrap:wrap}
+header strong{font-size:17px;margin-right:12px}
+header a,header button{color:#fff;text-decoration:none;opacity:.85;background:none;border:0;font:inherit;cursor:pointer;padding:0}
+header a:hover,header button:hover,header a.on{opacity:1;text-decoration:underline}
+header .sp{flex:1}
+main{max-width:1180px;margin:0 auto;padding:22px 24px 60px}
+h1{font-size:22px;margin:0 0 14px}h2{font-size:17px;margin:26px 0 8px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 16px;min-width:140px}
+.kpi b{display:block;font-size:26px;line-height:1.1}.kpi span{color:var(--mut);font-size:13px}
+.kpi.bad b{color:var(--crit)}
+.bar-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+select,input,button.btn{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink)}
+button.btn{background:var(--brand);color:#fff;border-color:var(--brand);cursor:pointer}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line)}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:13px;color:var(--mut);font-weight:600}
+.sup{display:flex;align-items:center;gap:8px;margin:3px 0;min-width:230px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.25)}
+.cor-preto{background:#222}.cor-ciano{background:#19a7d6}.cor-magenta{background:#d4378b}.cor-amarelo{background:#f2c81b}.cor-outro{background:#aaa}
+.bar{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.fill{height:100%}.fill.ok{background:var(--ok)}.fill.warn{background:var(--warn)}.fill.crit{background:var(--crit)}.fill.nd{background:var(--nd)}
+.pct{width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.pct.crit{color:var(--crit);font-weight:700}
+.tag{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--line)}
+.tag.off{background:var(--crit);color:#fff}
+.mut{color:var(--mut);font-size:13px}
+.msg{padding:9px 14px;border-radius:5px;margin-bottom:10px;background:var(--card);border-left:4px solid var(--ok)}
+.msg.warning{border-color:var(--warn)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+form.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.low{color:var(--crit);font-weight:700}
+.table-wrap{overflow-x:auto}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <strong>Gestão de toner</strong>
+  <a href="{% url 'dashboard' %}">Painel</a>
+  <a href="{% url 'estoque' %}">Estoque</a>
+  {% if user.is_staff %}<a href="/admin/">Cadastros</a>{% endif %}
+  <span class="sp"></span>
+  {% if user.is_authenticated %}<span>{{ user.get_username }}</span>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Sair</button></form>{% endif %}
+</header>
+<main>
+{% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

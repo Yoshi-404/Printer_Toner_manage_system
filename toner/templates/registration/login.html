@@ -1,0 +1,13 @@
+{% extends "toner/base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<div style="max-width:340px;margin:50px auto">
+<h1>Entrar</h1>
+<p class="mut">Acesso restrito à equipe de TI.</p>
+{% if form.errors %}<div class="msg warning">Usuário ou senha incorretos.</div>{% endif %}
+<form method="post">{% csrf_token %}
+<p><label>Usuário<br>{{ form.username }}</label></p>
+<p><label>Senha<br>{{ form.password }}</label></p>
+<button class="btn">Entrar</button>
+</form></div>
+{% endblock %}

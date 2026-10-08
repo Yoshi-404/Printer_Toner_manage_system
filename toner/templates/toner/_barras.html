@@ -1,0 +1,5 @@
+{% for s in imp.suprimentos.all %}
+<div class="sup"><span class="dot cor-{{ s.cor }}" title="{{ s.nome }}"></span>
+<div class="bar" title="{{ s.nome }}"><div class="fill {{ s.classe }}" style="width:{{ s.percentual|default:0 }}%"></div></div>
+<span class="pct {{ s.classe }}">{% if s.percentual is None %}n/d{% else %}{{ s.percentual }}%{% endif %}</span></div>
+{% empty %}<span class="mut">Sem leitura ainda</span>{% endfor %}

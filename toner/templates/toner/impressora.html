@@ -1,0 +1,38 @@
+{% extends "toner/base.html" %}
+{% block title %}{{ imp.nome }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'dashboard' %}">Voltar ao painel</a></p>
+<h1>{{ imp.nome }} <span class="mut">{{ imp.ip }} · {{ imp.setor }}</span></h1>
+<p class="mut">{{ imp.marca }} {{ imp.modelo }}{% if imp.contador_paginas %} · {{ imp.contador_paginas }} páginas impressas{% endif %}
+{% if not imp.online %} · <span class="tag off">sem resposta: {{ imp.ultimo_erro }}</span>{% endif %}</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Suprimento</th><th>Nível</th><th>Previsão</th></tr></thead>
+{% for s in imp.suprimentos.all %}
+<tr><td><span class="dot cor-{{ s.cor }}"></span> {{ s.nome }}</td>
+<td><div class="sup"><div class="bar"><div class="fill {{ s.classe }}" style="width:{{ s.percentual|default:0 }}%"></div></div>
+<span class="pct {{ s.classe }}">{% if s.percentual is None %}n/d{% else %}{{ s.percentual }}%{% endif %}</span></div></td>
+<td class="mut">{% with d=s.previsao_dias %}{% if d is not None %}acaba em ~{{ d }} dia{{ d|pluralize }}{% else %}histórico insuficiente{% endif %}{% endwith %}</td></tr>
+{% endfor %}</table></div>
+
+<h2>Registrar troca de toner</h2>
+<form method="post" action="{% url 'troca' imp.pk %}" class="inline">{% csrf_token %}
+  <select name="suprimento" required aria-label="Suprimento">{% for s in imp.suprimentos.all %}<option value="{{ s.pk }}">{{ s.nome }}</option>{% endfor %}</select>
+  <select name="toner" aria-label="Toner usado"><option value="">Toner usado (opcional)</option>
+    {% for t in toners %}<option value="{{ t.pk }}">{{ t.nome }} (estoque {{ t.estoque }})</option>{% endfor %}</select>
+  <input name="observacao" placeholder="Observação" maxlength="200">
+  <button class="btn">Registrar troca</button>
+</form>
+
+<div class="grid2">
+<div><h2>Trocas</h2><div class="table-wrap"><table>
+<thead><tr><th>Data</th><th>Suprimento</th><th>Toner</th><th>Quem</th></tr></thead>
+{% for t in trocas %}<tr><td>{{ t.data|date:"d/m/Y H:i" }}</td><td>{{ t.suprimento.nome|default:"-" }}</td><td>{{ t.toner|default:"-" }}</td>
+<td>{% if t.automatica %}<span class="tag">detectada</span>{% else %}{{ t.usuario|default:"-" }}{% endif %}</td></tr>
+{% empty %}<tr><td colspan="4" class="mut">Nenhuma troca registrada.</td></tr>{% endfor %}</table></div></div>
+<div><h2>Últimas leituras</h2><div class="table-wrap"><table>
+<thead><tr><th>Data</th><th>Suprimento</th><th>Nível</th></tr></thead>
+{% for l in leituras %}<tr><td>{{ l.data|date:"d/m H:i" }}</td><td>{{ l.suprimento.nome }}</td><td>{{ l.percentual|default_if_none:"n/d" }}{% if l.percentual is not None %}%{% endif %}</td></tr>{% endfor %}
+</table></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "toner/base.html" %}
+{% block content %}
+<h1>Painel de toner</h1>
+<div class="kpis">
+  <div class="kpi"><b>{{ resumo.total }}</b><span>impressoras</span></div>
+  <div class="kpi {% if resumo.criticos %}bad{% endif %}"><b>{{ resumo.criticos }}</b><span>com toner em {{ limite }}% ou menos</span></div>
+  <div class="kpi {% if resumo.offline %}bad{% endif %}"><b>{{ resumo.offline }}</b><span>sem resposta</span></div>
+  <div class="kpi {% if resumo.estoque_baixo %}bad{% endif %}"><b>{{ resumo.estoque_baixo }}</b><span>toners com estoque baixo</span></div>
+</div>
+<div class="bar-tools">
+  <form method="get" class="inline">
+    <select name="setor" onchange="this.form.submit()" aria-label="Setor">
+      <option value="">Todos os setores</option>
+      {% for s in setores %}<option {% if s == setor %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+    <label><input type="checkbox" name="criticos" value="1" {% if so_criticos %}checked{% endif %} onchange="this.form.submit()"> Só críticos</label>
+  </form>
+  <span class="sp" style="flex:1"></span>
+  <form method="post" action="{% url 'coletar' %}">{% csrf_token %}<button class="btn">Coletar agora</button></form>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Impressora</th><th>Setor</th><th>Modelo</th><th>Níveis</th><th>Última coleta</th></tr></thead>
+<tbody>
+{% for imp in impressoras %}
+<tr>
+  <td><a href="{% url 'impressora' imp.pk %}"><b>{{ imp.nome }}</b></a><br><span class="mut">{{ imp.ip }}</span>
+      {% if not imp.online %}<br><span class="tag off" title="{{ imp.ultimo_erro }}">sem resposta</span>{% endif %}</td>
+  <td>{{ imp.setor }}</td>
+  <td>{{ imp.marca }} {{ imp.modelo }}</td>
+  <td>{% include "toner/_barras.html" %}</td>
+  <td class="mut">{{ imp.ultima_coleta|date:"d/m H:i"|default:"nunca" }}</td>
+</tr>
+{% empty %}<tr><td colspan="5">Nenhuma impressora encontrada. Cadastre em <a href="/admin/toner/impressora/add/">Cadastros</a> ou rode <code>python manage.py popular_demo</code>.</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %}
+<script>
+  // Atualiza o painel automaticamente a cada 3 horas (10800000 ms)
+  setTimeout(function() {
+    window.location.reload();
+  }, 10800000);
+</script>

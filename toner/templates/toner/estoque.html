@@ -1,0 +1,15 @@
+{% extends "toner/base.html" %}
+{% block title %}Estoque{% endblock %}
+{% block content %}
+<h1>Estoque de toner</h1>
+<div class="table-wrap"><table>
+<thead><tr><th>Modelo</th><th>Cor</th><th>Em estoque</th><th>Mínimo</th><th>Usado em</th><th>Dar entrada</th></tr></thead>
+{% for t in toners %}
+<tr><td><b>{{ t.nome }}</b></td><td><span class="dot cor-{{ t.cor }}"></span> {{ t.get_cor_display }}</td>
+<td class="{% if t.baixo %}low{% endif %}">{{ t.estoque }}{% if t.baixo %} (repor){% endif %}</td><td>{{ t.estoque_minimo }}</td>
+<td class="mut">{% for i in t.impressoras.all %}{{ i.nome }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>
+<td><form method="post" class="inline">{% csrf_token %}<input type="hidden" name="toner" value="{{ t.pk }}">
+<input type="number" name="quantidade" min="1" value="1" style="width:70px" aria-label="Quantidade"><button class="btn">Adicionar</button></form></td></tr>
+{% empty %}<tr><td colspan="6">Nenhum modelo cadastrado. Cadastre em <a href="/admin/toner/modelotoner/add/">Cadastros</a>.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}
